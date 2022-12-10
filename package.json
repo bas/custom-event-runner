@@ -1,0 +1,19 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "Test a command-line app",
+  "main": "bin/index.js",
+  "bin": {
+    "hello": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bas Peters",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "launchdarkly-node-server-sdk": "^7.0.0",
+    "unique-names-generator": "^4.7.1"
+  }
+}
