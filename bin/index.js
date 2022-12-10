@@ -8,10 +8,13 @@ if (process.env.NODE_ENV !== "production") {
 
 const sdkKey = process.env.LAUNCHDARKLY_SDK_KEY;
 
+// what custom conversion metric to track
 const metricKey = process.env.METRIC_KEY;
 
+// the boolean feature flag to evaluate
 const featureFlagKey = process.env.FLAG_KEY;
 
+// times to evaluate the flag
 const times = process.env.TIMES;
 
 function showMessage(s) {
@@ -48,6 +51,7 @@ ldClient
               flagValue +
               " for this context"
           );
+          // if the flag returns true we send a track event
           if (flagValue) ldClient.track(metricKey, context);
         }
       );
@@ -62,28 +66,6 @@ ldClient
   });
 
 function getContext() {
-  const countries = [
-    "United States",
-    "Canada",
-    "Japan",
-    "Singapore",
-    "Norway",
-    "United Kingdom",
-    "The Netherlands",
-    "Germany",
-    "Indonesia",
-    "Australia",
-    "India",
-    "Namibia",
-    "France",
-    "Italy",
-    "Chile",
-  ];
-
-  const randomCountry = uniqueNamesGenerator({
-    dictionaries: [countries],
-  });
-
   let randomName = uniqueNamesGenerator({
     dictionaries: [names],
   });
@@ -95,7 +77,6 @@ function getContext() {
     key: email,
     email: email,
     name: randomName,
-    country: randomCountry,
   };
   return userContext;
 }
