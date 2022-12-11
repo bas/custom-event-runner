@@ -8,14 +8,20 @@ if (process.env.NODE_ENV !== "production") {
 
 const sdkKey = process.env.LAUNCHDARKLY_SDK_KEY;
 
-// what custom conversion metric to track
-const metricKey = process.env.METRIC_KEY;
+// what custom conversion metrics to track
+const primaryMetric = process.env.PRIMARY_METRIC_KEY;
+const secondaryMetric = process.env.SECONDARY_METRIC_KEY;
 
 // the boolean feature flag to evaluate
 const featureFlagKey = process.env.FLAG_KEY;
 
 // times to evaluate the flag
 const times = process.env.TIMES;
+
+const results = {
+  primaryMetric: 0,
+  secondaryMetric: 0,
+};
 
 function showMessage(s) {
   console.log("*** " + s);
@@ -37,26 +43,26 @@ ldClient
     showMessage("SDK successfully initialized!");
     for (var i = 0; i < times; i++) {
       const context = getContext();
-      showMessage("Random user: " + context.name);
-
       ldClient.variation(
         featureFlagKey,
         context,
         false,
         function (err, flagValue) {
-          showMessage(
-            "Feature flag '" +
-              featureFlagKey +
-              "' is " +
-              flagValue +
-              " for this context"
-          );
-          // if the flag returns true we send a track event
-          if (flagValue) ldClient.track(metricKey, context);
+          if (flagValue) {
+            metricKey = Math.random() < 0.7 ? primaryMetric : secondaryMetric;
+            showMessage(metricKey + " event for: " + context.name);
+            ldClient.track(metricKey, context);
+          } else {
+            if (Math.random() < 0.4) {
+              showMessage(secondaryMetric + " event for: " + context.name);
+              ldClient.track(secondaryMetric, context);
+            }
+          }
         }
       );
     }
     ldClient.flush(function () {
+      showMessage("Closing connection...");
       ldClient.close();
     });
   })
