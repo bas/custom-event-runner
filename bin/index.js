@@ -35,41 +35,40 @@ if (sdkKey == "") {
   process.exit(1);
 }
 
-const ldClient = LaunchDarkly.init(sdkKey);
+const options = {
+  logger: LaunchDarkly.basicLogger({
+    level: "debug",
+    destination: console.log,
+  }),
+};
 
-ldClient
-  .waitForInitialization()
-  .then(function () {
-    showMessage("SDK successfully initialized!");
+const ldClient = LaunchDarkly.init(sdkKey, options);
+
+const main = async () => {
+  try {
+    await ldClient.waitForInitialization();
     for (var i = 0; i < times; i++) {
       const context = getContext();
-      ldClient.variation(
+      const flagValue = await ldClient.variation(
         featureFlagKey,
         context,
-        false,
-        function (err, flagValue) {
-          if (flagValue) {
-            metricKey = Math.random() < 0.7 ? primaryMetric : secondaryMetric;
-            showMessage(metricKey + " event for: " + context.name);
-            ldClient.track(metricKey, context);
-          } else {
-            if (Math.random() < 0.4) {
-              showMessage(secondaryMetric + " event for: " + context.name);
-              ldClient.track(secondaryMetric, context);
-            }
-          }
-        }
+        false
       );
+      if (flagValue) {
+        metricKey = Math.random() < 0.5 ? primaryMetric : secondaryMetric;
+        showMessage(metricKey + " event for: " + context.name);
+        ldClient.track(metricKey, context);
+      }
     }
-    ldClient.flush(function () {
-      showMessage("Closing connection...");
+
+    ldClient.flush(() => {
       ldClient.close();
     });
-  })
-  .catch(function (error) {
-    showMessage("SDK failed to initialize: " + error);
+  } catch (error) {
+    console.error(error);
     process.exit(1);
-  });
+  }
+};
 
 function getContext() {
   let randomName = uniqueNamesGenerator({
@@ -86,3 +85,5 @@ function getContext() {
   };
   return userContext;
 }
+
+main();
