@@ -55,9 +55,9 @@ const main = async () => {
         false
       );
       if (flagValue) {
-        metricKey = Math.random() < 0.5 ? primaryMetric : secondaryMetric;
-        showMessage(metricKey + " event for: " + context.name);
-        ldClient.track(metricKey, context);
+        if (Math.random() < 0.6) ldClient.track(primaryMetric, context);
+      } else {
+        if (Math.random() < 0.5) ldClient.track(primaryMetric, context);
       }
     }
 
