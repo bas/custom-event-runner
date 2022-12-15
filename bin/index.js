@@ -42,6 +42,11 @@ const options = {
   }),
 };
 
+const outcome = {
+  "show": 0,
+  "hide": 0,
+};
+
 const ldClient = LaunchDarkly.init(sdkKey, options);
 
 const main = async () => {
@@ -55,13 +60,22 @@ const main = async () => {
         false
       );
       if (flagValue) {
-        if (Math.random() < 0.6) ldClient.track(primaryMetric, context);
+        if (Math.random() < 0.51) {
+          ldClient.track(primaryMetric, context, null, 1);
+          outcome.show = outcome.show + 1;
+        }
       } else {
-        if (Math.random() < 0.5) ldClient.track(primaryMetric, context);
+        if (Math.random() < 0.5) {
+          ldClient.track(primaryMetric, context, null, 1);
+          outcome.hide = outcome.hide + 1;
+        }
       }
     }
 
     ldClient.flush(() => {
+      showMessage(
+        "Total events: " + (outcome.show + outcome.hide) + ", true: " + outcome.show + ", false: " + outcome.hide
+      );
       ldClient.close();
     });
   } catch (error) {
