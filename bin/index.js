@@ -66,7 +66,7 @@ const main = async () => {
           outcome.show = outcome.show + qty;
         }
         // When we hide the buy now button we have roughly 50%
-        // buying between 1 and 10 items through the add to cart 
+        // buying between 1 and 10 items through the add to cart
         // checkout process.
       } else {
         if (Math.random() < 0.5) {
